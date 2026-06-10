@@ -4,11 +4,13 @@ import AppKit
 @main
 struct TimerStackApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject private var launchAtLogin = LaunchAtLoginManager.shared
 
     var body: some Scene {
         MenuBarExtra {
             Button("Mostrar / ocultar widget") { AppDelegate.shared?.togglePanel() }
                 .keyboardShortcut("t")
+            Toggle("Arrancar al iniciar sesión", isOn: $launchAtLogin.isEnabled)
             Divider()
             Button("Salir de TimerStack") { NSApp.terminate(nil) }
                 .keyboardShortcut("q")
