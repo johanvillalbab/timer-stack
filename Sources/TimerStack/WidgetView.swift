@@ -2,11 +2,13 @@ import SwiftUI
 
 private let widgetWidth: CGFloat = 200
 
-// MARK: - Vista raíz del widget
+// MARK: - Vista raíz del widget (Liquid Glass)
 
 struct WidgetView: View {
     @EnvironmentObject var model: AppModel
     var onResize: (CGSize) -> Void
+
+    private var isAlarming: Bool { model.timer?.isFinished == true }
 
     var body: some View {
         Group {
@@ -18,10 +20,9 @@ struct WidgetView: View {
         }
         .frame(width: widgetWidth)
         .fixedSize(horizontal: false, vertical: true)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .strokeBorder(.white.opacity(0.12), lineWidth: 1)
+        .glassEffect(
+            isAlarming ? .regular.tint(.red.opacity(0.25)) : .regular,
+            in: .rect(cornerRadius: 24, style: .continuous)
         )
         .background(
             GeometryReader { geo in
@@ -37,7 +38,7 @@ private struct WidgetSizeKey: PreferenceKey {
     static func reduce(value: inout CGSize, nextValue: () -> CGSize) { value = nextValue() }
 }
 
-// MARK: - Cuenta regresiva (wireframe: tiempo grande + 3 controles circulares)
+// MARK: - Cuenta regresiva (tiempo grande + 3 controles circulares de vidrio)
 
 struct CountdownView: View {
     @EnvironmentObject var model: AppModel
@@ -57,17 +58,21 @@ struct CountdownView: View {
                 .minimumScaleFactor(0.5)
                 .padding(.horizontal, 16)
 
-            HStack(spacing: 14) {
-                if !item.isFinished {
-                    controlButton(item.isRunning ? "pause.fill" : "play.fill") {
-                        model.toggle()
+            // Los controles comparten un contenedor de vidrio: al estar cerca,
+            // Liquid Glass fusiona sus formas entre sí.
+            GlassEffectContainer(spacing: 14) {
+                HStack(spacing: 14) {
+                    if !item.isFinished {
+                        controlButton(item.isRunning ? "pause.fill" : "play.fill") {
+                            model.toggle()
+                        }
                     }
-                }
-                controlButton("arrow.counterclockwise") {
-                    model.reset()
-                }
-                controlButton("xmark") {
-                    model.clear()
+                    controlButton("arrow.counterclockwise") {
+                        model.reset()
+                    }
+                    controlButton("xmark") {
+                        model.clear()
+                    }
                 }
             }
         }
@@ -95,9 +100,9 @@ struct CountdownView: View {
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .frame(width: 34, height: 34)
-                .background(.quaternary, in: Circle())
         }
         .buttonStyle(.plain)
+        .glassEffect(.regular.interactive(), in: .circle)
     }
 }
 
@@ -116,18 +121,20 @@ struct SetTimeView: View {
                 .font(.caption.weight(.medium))
                 .foregroundStyle(.secondary)
 
-            HStack(spacing: 5) {
-                ForEach(presets, id: \.self) { m in
-                    Button {
-                        model.set(duration: TimeInterval(m * 60))
-                    } label: {
-                        Text("\(m)′")
-                            .font(.caption.weight(.medium))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 5)
-                            .background(.quaternary, in: Capsule())
+            GlassEffectContainer(spacing: 5) {
+                HStack(spacing: 5) {
+                    ForEach(presets, id: \.self) { m in
+                        Button {
+                            model.set(duration: TimeInterval(m * 60))
+                        } label: {
+                            Text("\(m)′")
+                                .font(.caption.weight(.medium))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 5)
+                        }
+                        .buttonStyle(.plain)
+                        .glassEffect(.regular.interactive(), in: .capsule)
                     }
-                    .buttonStyle(.plain)
                 }
             }
 
@@ -142,6 +149,7 @@ struct SetTimeView: View {
                 Button("Iniciar") { startCustom() }
                     .font(.caption.weight(.semibold))
                     .controlSize(.small)
+                    .buttonStyle(.glass)
                     .keyboardShortcut(.defaultAction)
             }
             .textFieldStyle(.roundedBorder)
