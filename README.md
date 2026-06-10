@@ -13,7 +13,7 @@ Built with SwiftUI + AppKit. No Electron, no dependencies, no subscriptions.
 Every timer app wants to be a productivity suite. TimerStack wants to be a timer:
 
 - **Always on top** — floats above every window, every Space, even fullscreen apps
-- **Looks like macOS** — ultra-thin material, rounded corners, SF Symbols; it could ship with the OS
+- **Liquid Glass, the real thing** — built on the native `glassEffect` API from macOS 26, not a blur imitation; it could ship with the OS
 - **Grab it anywhere** — drag the widget from any point; it remembers where you left it
 - **Truly native** — a single small binary; idles at ~0% CPU when no timer is running
 - **Never loses time** — countdowns are anchored to a target date, so they survive app restarts and Mac sleep without drifting a single second
@@ -42,7 +42,7 @@ Or just build locally:
 open dist/TimerStack.app
 ```
 
-Requires macOS 14 (Sonoma) or later and Xcode command line tools.
+Requires macOS 26 (Tahoe) or later and Xcode 26 command line tools.
 
 ## Usage
 
@@ -73,6 +73,7 @@ Sources/TimerStack/
 A few details worth stealing:
 
 - **The window is an `NSPanel`**, not an `NSWindow` — `[.borderless, .nonactivatingPanel]` with `level = .floating` and `canJoinAllSpaces`, so it stays on top everywhere without ever stealing focus from the app you're working in.
+- **Native Liquid Glass** — the widget body is a single `.glassEffect(.regular, in: .rect)` that tints red while the alarm fires; controls are interactive glass circles inside a `GlassEffectContainer`, so neighboring shapes merge fluidly.
 - **Date-anchored countdowns** — a running timer stores its `endDate`; remaining time is always computed against `Date()`. No accumulated tick drift, immune to sleep.
 - **A UI tick that knows when to stop** — a single 0.25 s timer refreshes the display only while a countdown is running; otherwise the app is completely idle.
 - **No Xcode project** — plain Swift Package Manager plus a 20-line `build.sh` that assembles and ad-hoc signs the `.app` bundle.
