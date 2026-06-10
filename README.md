@@ -25,6 +25,7 @@ Every timer app wants to be a productivity suite. TimerStack wants to be a timer
 - **Three-button control** — pause/resume, reset, dismiss; nothing more
 - **Alarm you'll notice** — system sound plus a red flashing display until you acknowledge it
 - **Menu bar companion** — show/hide the widget or quit from a discreet ⏱ icon
+- **Starts with your Mac** — registers as a login item via `SMAppService` on first run; toggle it off from the menu bar
 - **Persistent** — running timer and widget position are restored on relaunch
 
 ## Install
