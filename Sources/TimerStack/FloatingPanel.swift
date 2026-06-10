@@ -24,7 +24,9 @@ final class FloatingPanelController {
         panel.backgroundColor = .clear
         panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        panel.hasShadow = true
+        // Sin sombra de AppKit: se dibuja sobre el rect cuadrado del panel y deja
+        // un marco fantasma alrededor del vidrio. Liquid Glass ya aporta borde y profundidad.
+        panel.hasShadow = false
         panel.isMovableByWindowBackground = true
         panel.becomesKeyOnlyIfNeeded = true
         panel.hidesOnDeactivate = false

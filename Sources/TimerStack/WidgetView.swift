@@ -20,10 +20,14 @@ struct WidgetView: View {
         }
         .frame(width: widgetWidth)
         .fixedSize(horizontal: false, vertical: true)
+        // .clear: vidrio realmente transparente que refracta lo de atrás
+        // (.regular se ve lechoso sobre fondos claros).
         .glassEffect(
-            isAlarming ? .regular.tint(.red.opacity(0.25)) : .regular,
+            isAlarming ? .clear.tint(.red.opacity(0.3)) : .clear,
             in: .rect(cornerRadius: 24, style: .continuous)
         )
+        // Evita el marco de foco que macOS dibuja al volverse key el panel.
+        .focusEffectDisabled()
         .background(
             GeometryReader { geo in
                 Color.clear.preference(key: WidgetSizeKey.self, value: geo.size)
@@ -139,12 +143,10 @@ struct SetTimeView: View {
             }
 
             HStack(spacing: 5) {
-                TextField("min", text: $minutes)
-                    .frame(width: 42)
+                timeField("min", text: $minutes)
                 Text(":")
                     .foregroundStyle(.secondary)
-                TextField("seg", text: $seconds)
-                    .frame(width: 42)
+                timeField("seg", text: $seconds)
                 Spacer()
                 Button("Iniciar") { startCustom() }
                     .font(.caption.weight(.semibold))
@@ -152,14 +154,20 @@ struct SetTimeView: View {
                     .buttonStyle(.glass)
                     .keyboardShortcut(.defaultAction)
             }
-            .textFieldStyle(.roundedBorder)
-            .controlSize(.small)
             .font(.caption.monospacedDigit())
-            .multilineTextAlignment(.center)
             .onSubmit { startCustom() }
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 14)
+    }
+
+    private func timeField(_ placeholder: String, text: Binding<String>) -> some View {
+        TextField(placeholder, text: text)
+            .textFieldStyle(.plain)
+            .multilineTextAlignment(.center)
+            .frame(width: 38)
+            .padding(.vertical, 5)
+            .glassEffect(.regular, in: .capsule)
     }
 
     private func startCustom() {
